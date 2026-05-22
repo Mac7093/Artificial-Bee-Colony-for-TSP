@@ -21,6 +21,8 @@ class GeneticAlgorithm:
         self.current_best_solution = self.population[0]
         self.best_cost = self.evaluate_distance(self.current_best_solution)
 
+        self.test_data = []
+
     def generate_possible_solution(self):
         nodes = list(self.G.nodes)
         random.shuffle(nodes)
@@ -97,6 +99,7 @@ class GeneticAlgorithm:
                 if cost < self.best_cost:
                     self.best_cost = cost
                     self.best_solution = i.copy()
+            self.test_data.append([generation, self.best_cost])
         return self.best_solution, self.best_cost
     
 if __name__ == "__main__":
@@ -126,9 +129,12 @@ if __name__ == "__main__":
         Gn = nx.from_numpy_array(matriz)
     
     n_testes = 10
+    max_iter = 100
     results = []
     best_result_path = []
     best_result_fitness = float('inf')
+
+    history = np.zeros
 
     start = datetime.datetime.now()
 

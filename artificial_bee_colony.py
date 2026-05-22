@@ -4,9 +4,10 @@ import random
 import datetime
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 class ArtificialBeeColony:
-    def __init__(self, G, num_bees, max_iterations, limit=20, seed=None):
+    def __init__(self, G, num_bees, max_iterations, limit=200, seed=None):
         self.G = G
         self.num_bees = num_bees
         self.max_iterations = max_iterations
@@ -105,7 +106,7 @@ class ArtificialBeeColony:
         return self.current_best_solution, self.current_best_cost
         
 if __name__ == "__main__":
-    arquivo = 'instancia.txt'
+    arquivo = 'teste15.txt'
 
     if arquivo == 'instancia.txt':
         with open(arquivo, 'r') as file:
@@ -135,20 +136,26 @@ if __name__ == "__main__":
     np.random.seed(seed)
     
     n_testes = 10
+    max_iter = 500
     results = []
     best_result_path = []
     best_result_fitness = float('inf')
 
+    history = np.zeros((n_testes, max_iter))
+
     start = datetime.datetime.now()
 
     for i in range(n_testes):
-        abc = ArtificialBeeColony(Gn, num_bees = 53, max_iterations=500, seed=seed+i)
+        abc = ArtificialBeeColony(Gn, num_bees = 53, max_iterations=max_iter, seed=seed+i)
 
         best_path, best_fitness = abc.run()
 
         if best_fitness < best_result_fitness:
             best_result_fitness = best_fitness
             best_result_path = best_path
+
+        i_cost = [passo[1] for passo in abc.test_data]
+        history[i, :] = i_cost
         
         results.append(best_fitness)
 
@@ -157,6 +164,48 @@ if __name__ == "__main__":
     abc_time = end - start
 
     performance_average = np.mean(results)
+
+    iteration_average = np.mean(history, axis=0)
+    best_iteration = np.min(history, axis=0)
+    worst_iteration = np.max(history, axis=0)
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+    ax1.plot(iteration_average, label='Custo Médio', color='blue', linewidth=2)
+    ax1.plot(best_iteration, label='Melhor Rodada', color='green', linestyle='--')
+    ax1.plot(worst_iteration, label='Pior Rodada', color='red', linestyle=':')
+
+    ax1.fill_between(range(max_iter), best_iteration, worst_iteration, color='blue', alpha=0.1)
+
+    ax1.set_title('Curva de Convergência')
+    ax1.set_xlabel('Iterações')
+    ax1.set_ylabel('Custo do Caminho')
+    ax1.grid(True, linestyle='--', alpha=0.6)
+    ax1.legend()
+
+    ax2.boxplot(results, patch_artist=True, showfliers=False,
+                boxprops=dict(facecolor='lightblue', color='blue'),
+                medianprops=dict(color='red', linewidth=2))
+
+    posicao_x = np.random.normal(1, 0.03, size=len(results))
+
+    ax2.scatter(posicao_x, results, 
+                color='darkblue', 
+                alpha=0.7, 
+                s=60,                 
+                edgecolors='black',     
+                label='Tentativas Individuais ' + str(n_testes),
+                zorder=3)
+
+    ax2.set_title('Dispersão dos Resultados Finais')
+    ax2.set_ylabel('Custo Final')
+    ax2.set_xticks([1])
+
+    ax2.grid(True, linestyle='--', alpha=0.3)
+    ax2.legend()
+    plt.tight_layout()
+    plt.savefig(f'analise_resultados_{arquivo}.png', dpi=300)
+    plt.show()
 
     print("Performance average: ", performance_average, "in", n_testes, "epochs")
     print("Best optimal path: ", best_result_path)
