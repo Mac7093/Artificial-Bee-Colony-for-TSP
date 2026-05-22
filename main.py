@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from genetic_algorithm import GeneticAlgorithm
 from artificial_bee_colony import ArtificialBeeColony
 
-arquivo = 'teste26.txt'
+arquivo = 'tests/teste15.txt'
 
-if arquivo == 'instancia.txt':
+if arquivo == 'teste/instancia.txt':
     with open(arquivo, 'r') as file:
         n_cities = int(file.readline().strip())
         
@@ -49,8 +49,8 @@ history = np.zeros((n_testes, max_iter))
 start = datetime.datetime.now()
 
 for i in range(n_testes):
-    #algoritmo = ArtificialBeeColony(Gn, num_bees = 53, max_iterations=max_iter, limit=200, seed=seed+i)
-    algoritmo = GeneticAlgorithm(Gn, 53, max_iter, 0.9, 0.15, seed=seed+i)
+    algoritmo = ArtificialBeeColony(Gn, num_bees = 53, max_iterations=max_iter, limit=200, seed=seed+i)
+    #algoritmo = GeneticAlgorithm(Gn, 53, max_iter, 0.9, 0.15, seed=seed+i)
 
     best_path, best_fitness = algoritmo.run()
 
@@ -76,6 +76,8 @@ best_iteration = np.min(history, axis=0)
 worst_iteration = np.max(history, axis=0)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+arquivo = arquivo[6:]
 
 fig.suptitle(f"Resultados {arquivo} {tag}")
 
