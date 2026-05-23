@@ -1,123 +1,111 @@
-import networkx as nx
-import pandas as pd
-import random
-import datetime
-import numpy as np
-import math
-import matplotlib.pyplot as plt
+import experiment
+import time
 
-from genetic_algorithm import GeneticAlgorithm
-from artificial_bee_colony import ArtificialBeeColony
+while True:
+    print("\n[ MENU PRINCIPAL ]")
+    print("1 - Colônia Artificial de Abelhas (ABC)")
+    print("2 - Algoritmo Genético (GA)")
+    print("3 - Sair do Programa")
 
-arquivo = 'tests/teste15.txt'
+    try:
+        op = int(input("Escolha uma opção: "))
+        if op == 3:
+            break
+        if op not in [1, 2]:
+            print("Opção Inválida")
+            continue
+    except ValueError:
+        print("Digite apenas números inteiros")
+        continue
 
-if arquivo == 'teste/instancia.txt':
-    with open(arquivo, 'r') as file:
-        n_cities = int(file.readline().strip())
+    while True:
+        algorithm = "Artificial Bee Colony" if op == 1 else "Genetic Algorithm"
+        print(f"\n--- Configurações para: {algorithm} ---")
+        print("Digite os parâmetros ou digite 'v' para voltar ao menu anterior.")
         
-        coordenadas = {}
-        for i, linha in enumerate(file):
-            x, y = map(float, linha.split())
-            coordenadas[i] = (x, y)
-        Gn = nx.complete_graph(n_cities)
-        nx.set_node_attributes(Gn, coordenadas, "pos")
+        #Hiperparâmetros do Algoritmo de Colônia de Abelhas
+        #Número de testes
+        arquivos = ['tests/instancia.txt', 'tests/teste15.txt', 'tests/teste17.txt', 'tests/teste26.txt', 'tests/teste42.txt', 'tests/teste48.txt']
+        print("\nArquivos de teste disponíveis:")
+        for idx, arquivo_opcao in enumerate(arquivos, start=1):
+            print(f"{idx} - {arquivo_opcao}")
+        inp_arq = input("Escolha o número do arquivo (Padrão: 1 - tests/instancia.txt): ").strip()
+        if inp_arq.lower() == 'v': break
+        if not inp_arq:
+            arq = 'tests/instancia.txt'
+        else:
+            try:
+                num_arq = int(inp_arq)
+                if 1 <= num_arq <= len(arquivos):
+                    arq = arquivos[num_arq - 1]  # -1 porque listas em Python começam em 0
+                else:
+                    print(f"[Aviso] Opção inválida. Usando o padrão: tests/instancia.txt")
+                    arq = 'tests/instancia.txt'
+            except ValueError:
+                print(f"[Aviso] Entrada inválida. Usando o padrão: tests/instancia.txt")
+                arq = 'tests/instancia.txt'
 
-        for u, v in Gn.edges():
-            pos_u = coordenadas[u]
-            pos_v = coordenadas[v]
+        try:
+            # Número de testes
+            inp = input("Número de testes independentes (Default: 10): ").strip()
+            if inp.lower() == 'v': break
+            n_testes = int(inp) if inp else 10
 
-            distancia = math.dist(pos_u, pos_v)
+            #Max Iterações
+            inp = input("Número máximo de iterações/épocas (Default: 100): ").strip()
+            if inp.lower() == 'v': break
+            max_iter = int(inp) if inp else 100
 
-            Gn[u][v]['weight'] = distancia
-else:
-    matriz = np.loadtxt(arquivo)
+            # Semente (Seed)
+            inp = input("Seed (Padrão: 42): ").strip()
+            if inp.lower() == 'v': break
+            seed_val = int(inp) if inp else 42 
+            
+        except ValueError:
+            print("\n[ERRO] Tipo de dado incorreto inserido")
+            continue
 
-    Gn = nx.from_numpy_array(matriz)
+        if op == 1:
+            # Hiperparâmetros da Colônia de Abelhas
+            try:
+                inp = input("Número de abelhas / num_bees (Padrão: 53): ").strip()
+                if inp.lower() == 'v': break
+                num_bees = int(inp) if inp else 53
 
-seed = 42
-random.seed(seed)
-np.random.seed(seed)
+                inp = input("Limite de tentativas / limit (Padrão: 20): ").strip()
+                if inp.lower() == 'v': break
+                limit = int(inp) if inp else 20
+                
+                # Instancia a classe passando as variáveis lidas
+                exp = experiment.experiment(arquivo=arq, n_testes=n_testes, max_iter=max_iter, 
+                                    num_bees=num_bees, limit=limit, seed=seed_val)
+            except ValueError:
+                print("\n[ERRO] Parâmetros numéricos da Colônia inválidos. Reiniciando...")
+                continue
 
-n_testes = 10
-max_iter = 100
-results = []
-best_result_path = []
-best_result_fitness = float('inf')
+        else:
+            # Hiperparâmetros do Algoritmo Genético
+            try:
+                inp = input("Tamanho da população / population_size (Padrão: 53): ").strip()
+                if inp.lower() == 'v': break
+                population_size = int(inp) if inp else 53
 
-history = np.zeros((n_testes, max_iter))
+                inp = input("Taxa de Crossover [0.0 a 1.0] (Padrão: 0.9): ").strip()
+                if inp.lower() == 'v': break
+                crossover = float(inp) if inp else 0.9
 
-start = datetime.datetime.now()
+                inp = input("Taxa de Mutação [0.0 a 1.0] (Padrão: 0.15): ").strip()
+                if inp.lower() == 'v': break
+                mutation = float(inp) if inp else 0.15
+                
+                # Instancia a classe passando as variáveis lidas
+                exp = experiment.experiment(arquivo=arq, n_testes=n_testes, max_iter=max_iter, 
+                                    population_size=population_size, crossover_rate=crossover, 
+                                    mutation_rate=mutation, seed=seed_val)
+            except ValueError:
+                print("\n[ERRO] Parâmetros numéricos do AG inválidos. Reiniciando...")
+                continue
 
-for i in range(n_testes):
-    algoritmo = ArtificialBeeColony(Gn, num_bees = 53, max_iterations=max_iter, limit=200, seed=seed+i)
-    #algoritmo = GeneticAlgorithm(Gn, 53, max_iter, 0.9, 0.15, seed=seed+i)
-
-    best_path, best_fitness = algoritmo.run()
-
-    if best_fitness < best_result_fitness:
-        best_result_fitness = best_fitness
-        best_result_path = best_path
-
-    i_cost = [passo[1] for passo in algoritmo.test_data]
-    history[i, :] = i_cost
-    
-    results.append(best_fitness)
-
-end = datetime.datetime.now()
-
-algoritmo_time = end - start
-
-tag = 'ga' if isinstance(algoritmo, GeneticAlgorithm) else 'abs'
-
-performance_average = np.mean(results)
-
-iteration_average = np.mean(history, axis=0)
-best_iteration = np.min(history, axis=0)
-worst_iteration = np.max(history, axis=0)
-
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-
-arquivo = arquivo[6:]
-
-fig.suptitle(f"Resultados {arquivo} {tag}")
-
-ax1.plot(iteration_average, label='Custo Médio', color='blue', linewidth=2)
-ax1.plot(best_iteration, label='Melhor Rodada', color='green', linestyle='--')
-ax1.plot(worst_iteration, label='Pior Rodada', color='red', linestyle=':')
-
-ax1.fill_between(range(max_iter), best_iteration, worst_iteration, color='blue', alpha=0.1)
-
-ax1.set_title('Curva de Convergência')
-ax1.set_xlabel('Iterações')
-ax1.set_ylabel('Custo do Caminho')
-ax1.grid(True, linestyle='--', alpha=0.6)
-ax1.legend()
-
-ax2.boxplot(results, patch_artist=True, showfliers=False,
-            boxprops=dict(facecolor='lightblue', color='blue'),
-            medianprops=dict(color='red', linewidth=2))
-
-posicao_x = np.random.normal(1, 0.03, size=len(results))
-
-ax2.scatter(posicao_x, results, 
-            color='darkblue', 
-            alpha=0.7, 
-            s=60,                 
-            edgecolors='black',     
-            label='Tentativas Individuais ' + str(n_testes),
-            zorder=3)
-
-ax2.set_title('Dispersão dos Resultados Finais')
-ax2.set_ylabel('Custo Final')
-ax2.set_xticks([1])
-
-ax2.grid(True, linestyle='--', alpha=0.3)
-ax2.legend()
-plt.tight_layout()
-plt.savefig(f'results/analise_resultados_{arquivo}_{tag}.png', dpi=300)
-plt.show()
-
-print("Performance average: ", performance_average, "in", n_testes, "epochs")
-print("Best optimal path: ", best_result_path)
-print("Best optimal path cost: ", best_result_fitness)
-print("Total Exec time => ", algoritmo_time.total_seconds())
+        exp.execute_experiment(algorithm)
+        time.sleep(3)
+        break
