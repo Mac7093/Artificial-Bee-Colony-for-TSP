@@ -4,6 +4,8 @@ import datetime
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import os
+import pandas as pd
 
 from genetic_algorithm import GeneticAlgorithm
 from artificial_bee_colony import ArtificialBeeColony
@@ -135,3 +137,41 @@ class experiment:
         print("Best optimal path: ", best_result_path)
         print("Best optimal path cost: ", best_result_fitness)
         print("Total Exec time => ", algoritmo_time.total_seconds())
+
+
+        if algorithm == 1:
+            csv_path = 'results/historico_experimentos_abc.csv'
+            dados_experimento = {
+            'Caso_Teste': [arquivo],
+            'Algoritmo': [algorithm_name],
+            'Num_Execucoes': [self.n_testes],
+            'Iteracoes_Max': [self.max_iter],
+            'Num_Bees': [self.num_bees],
+            'Limit': [self.limit],
+            'Custo_Medio': [performance_average],
+            'Melhor_Custo_Encontrado': [best_result_fitness],
+            'Tempo_Exec_Segundos': [algoritmo_time.total_seconds()],
+            'Seed': [self.seed]
+        }
+        else:
+            csv_path = 'results/historico_experimentos_ga.csv'
+            dados_experimento = {
+            'Caso_Teste': [arquivo],
+            'Algoritmo': [algorithm_name],
+            'Num_Execucoes': [self.n_testes],
+            'Iteracoes_Max': [self.max_iter],
+            'Population_size': [self.population_size],
+            'Crossover_rate': [self.crossover_rate],
+            'Mutation_rate': [self.mutation_rate],
+            'Custo_Medio': [performance_average],
+            'Melhor_Custo_Encontrado': [best_result_fitness],
+            'Tempo_Exec_Segundos': [algoritmo_time.total_seconds()],
+            'Seed': [self.seed]
+        }
+            
+        df = pd.DataFrame(dados_experimento)
+        if os.path.exists(csv_path):
+            df.to_csv(csv_path, mode='a', header=False, index=False)
+        else:
+            os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+            df.to_csv(csv_path, mode='w', header=True, index=False)
