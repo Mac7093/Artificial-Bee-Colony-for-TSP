@@ -3,7 +3,7 @@ Comparação do desempenho do algoritmo Artificial Bee Colony com o Algoritmo Ge
 # Algoritmo de Colônia de Abelhas Artificial (ABC) para o PCV
 
 O módulo "artificial_bee_colony.py' implementa a meta-heurística baseada na Inteligência de Enxame chamada Artificial Bee Colony (ABC), aplicada para resolver o Problema do Caixeiro Viajante (TSP). O objetivo principal do algoritmo é encontrar a rota mais curta possível que visite todas as cidades (nós do grafo) exatamente uma vez e retorne à cidade de origem.
-O algoritmo simula o comportamento de busca por alimento de uma colônia de abelhas real. O código divide a população total de abelhas (num_bees) em três funções diferentes:
+O código divide a população total de abelhas (num_bees) em três funções:
 
 ### 1. Abelhas Operárias (Employed Bees)
 *   Cada abelha operária cuida de uma fonte de alimento específica (uma rota atual). Elas tentam melhorar essa rota fazendo pequenas alterações nela (exploração local).
@@ -60,7 +60,7 @@ O algoritmo simula a seleção natural, onde as melhores soluções têm maior c
 ## Estrutura das Funções em `genetic_algorithm.py`
 
 *   `__init__`: Inicializa os parâmetros do algoritmo, gera a população inicial de indivíduos (rotas aleatórias) e configura o tamanho da população e as taxas evolutivas.
-*   `evaluate_distance(path)` / `calculate_fitness(path)`: **Função de Aptidão**. Mede o comprimento total da rota. Quanto menor a distância, maior é o *fitness* (aptidão) desse indivíduo na população.
+*   `evaluate_distance(path)`: **Função de Custo**. Mede o comprimento total da rota. Quanto menor a distância, maior é o *fitness* (aptidão) desse indivíduo na população.
 *   `crossover(parent1, parent2)`: Realiza a combinação genética entre duas rotas para gerar descendentes, respeitando a regra de não duplicar cidades.
 *   `mutate(path)`: Aplica uma alteração aleatória na rota do indivíduo baseado na probabilidade de mutação.
 *   `run()`: O laço principal que comanda a evolução por várias gerações até atingir `max_generation`. A cada geração, os indivíduos são selecionados, cruzados, mutados e a população antiga é substituída pela nova, salvando o histórico em `self.test_data`.
@@ -72,6 +72,6 @@ O algoritmo simula a seleção natural, onde as melhores soluções têm maior c
 | Parâmetro | O que afeta no algoritmo |
 | :--- | :--- |
 | `population_size` | O tamanho da população (número de rotas por geração). Uma população maior explora mais caminhos ao mesmo tempo, reduzindo a chance de erro, mas torna o processamento de cada geração mais lento. |
-| `max_generation` | O tempo total de evolução. É o número de gerações que o algoritmo terá para cruzar e refinar as rotas em busca do melhor circuito. |
+| `max_generation` | O tempo total de evolução. É o número de gerações que o algoritmo terá para cruzar e refinar as rotas em busca do melhor caminho. |
 | `crossover_rate` | A intensidade de recombinação (geralmente entre 0.7 e 0.95). Define a chance de dois pais gerarem filhos misturados. Se for muito baixa, o algoritmo vira uma busca quase estagnada que apenas repete os pais. |
 | `mutation_rate` | A taxa de inovação (geralmente entre 0.01 e 0.2). Controla a frequência com que novas rotas aleatórias surgem. Se for muito alta, o algoritmo vira uma busca puramente aleatória; se for muito baixa, a população se torna homogênea e para de evoluir. |
