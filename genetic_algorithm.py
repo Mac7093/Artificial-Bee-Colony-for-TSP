@@ -27,8 +27,8 @@ class GeneticAlgorithm:
         self.population = [self.generate_possible_solution() for i in range(self.population_size)]
         
         # Define o primeiro indivíduo gerado como a melhor solução inicial
-        self.current_best_solution = self.population[0]
-        self.best_cost = self.evaluate_distance(self.current_best_solution)
+        self.best_solution = self.population[0].copy()
+        self.best_cost = self.evaluate_distance(self.best_solution)
 
         # Armazena o histórico do custo da melhor rota ao longo das gerações
         self.test_data = []
@@ -53,13 +53,14 @@ class GeneticAlgorithm:
             distance += self.G[curr_node][next_node]['weight']
         return distance
     
-    def selection_tournament(self, k=3):
+    def selection_tournament(self, population_cost, k=3):
         """
         Seleção por Torneio: Sorteia 'k' indivíduos aleatórios da população e 
         retorna aquele que tiver o menor custo de rota (o mais apto do subgrupo).
         """
-        tournament = random.sample(self.population, k)
-        return min(tournament, key=self.evaluate_distance)
+        tournament = random.sample(population_cost, k)
+        winner = min(tournament, key=lambda item: item[1])
+        return winner[0]
     
     def crossover_order(self, parent1, parent2):
         """
@@ -83,19 +84,21 @@ class GeneticAlgorithm:
         child1[idx1:idx2] = parent1[idx1:idx2]
         child2[idx1:idx2] = parent2[idx1:idx2]
 
-        def fill_child(child, parent):
+        def fill_child(child, parent, initial_set):
             """Preenche os espaços restantes (-1) usando a ordem das cidades do outro pai"""
             current_pos = idx2 % size
+            added = initial_set
             for item in parent:
                 # Se a cidade ainda não foi inserida na rota do filho
-                if item not in child:
+                if item not in added:
                     child[current_pos] = item
+                    added.add(item)
                     current_pos = (current_pos + 1) % size
             return child
         
         # Preenche os vazios do Filho 1 usando o Pai 2, e do Filho 2 usando o Pai 1
-        child1 = fill_child(child1, parent2)
-        child2 = fill_child(child2, parent1)
+        child1 = fill_child(child1, parent2, set(parent1[idx1:idx2]))
+        child2 = fill_child(child2, parent1, set(parent2[idx1:idx2]))
 
         return child1, child2
     
@@ -114,17 +117,24 @@ class GeneticAlgorithm:
         Laço evolucionário principal que comanda a transição entre gerações.
         """
         for generation in range(self.max_generation):
-            new_population = []
+            pop_with_costs = [(ind, self.evaluate_distance(ind)) for ind in self.population]
 
-            # Identifica a melhor rota da geração atual e a envia para a próxima geração sem alterações. Isso impede a perda de boas soluções.
-            current_best = min(self.population, key=self.evaluate_distance)
-            new_population.append(current_best.copy())
+            current_best_ind, current_best_cost = min(pop_with_costs, key=lambda item: item[1])
+
+            if current_best_cost < self.best_cost:
+                self.best_cost = current_best_cost
+                self.best_solution = current_best_ind.copy()
+            
+            #Guarda o histórico para os gráficos
+            self.test_data.append([generation, self.best_cost])
+
+            new_population = [current_best_ind.copy()]
             
             # Continua gerando filhos até preencher o tamanho completo de indivíduos
             while len(new_population) < self.population_size:
                 # Seleciona os pais usando o mecanismo de torneio
-                p1 = self.selection_tournament()
-                p2 = self.selection_tournament()
+                p1 = self.selection_tournament(pop_with_costs)
+                p2 = self.selection_tournament(pop_with_costs)
 
                 # Cruza os pais gerando novos caminhos filhos
                 c1, c2 = self.crossover_order(p1, p2)
@@ -140,16 +150,4 @@ class GeneticAlgorithm:
             
 
             self.population = new_population
-
-            # Atualiza o melhor indivíduo histórico
-            for i in self.population:
-                cost = self.evaluate_distance(i)
-                if cost < self.best_cost:
-                    self.best_cost = cost
-                    self.best_solution = i.copy()
-                    
-            # Guarda o registro histórico do custo dessa geração para gerar os gráficos
-            self.test_data.append([generation, self.best_cost])
-            
-        # Retorna a melhor rota encontrada pelo algoritmo e seu respectivo custo
         return self.best_solution, self.best_cost
