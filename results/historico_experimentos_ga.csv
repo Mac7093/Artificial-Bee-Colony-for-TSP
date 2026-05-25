@@ -1,3 +1,0 @@
-Caso_Teste,Algoritmo,Num_Execucoes,Iteracoes_Max,Population_size,Crossover_rate,Mutation_rate,Custo_Medio,Melhor_Custo_Encontrado,Tempo_Exec_Segundos,Seed
-instancia.txt,Genetic Algorithm,10,100,53,0.9,0.15,29.248731902877086,29.248731902877086,3.50709,42
-teste15.txt,Genetic Algorithm,10,300,53,0.9,0.15,291.0,291.0,12.441162,42

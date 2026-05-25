@@ -130,7 +130,8 @@ class experiment:
         ax2.legend()                                                
         plt.tight_layout()                                          #Ajusta as margens automaticamente para evitar sobreposição de textos e eixos
         save_name = arquivo.replace('.txt', '')
-        plt.savefig(f'results/analise_resultados_{save_name}_{tag}.png', dpi=300)     #Salva os gráficos em uma imagem
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        plt.savefig(f'results/analise_resultados_{save_name}_{tag}_{timestamp}.png', dpi=300)     #Salva os gráficos em uma imagem
         plt.show()                                                  #Renderiza os gráficos na tela do usuário
 
         print("Performance average: ", performance_average, "in", self.n_testes, "epochs")
@@ -151,7 +152,8 @@ class experiment:
             'Custo_Medio': [performance_average],
             'Melhor_Custo_Encontrado': [best_result_fitness],
             'Tempo_Exec_Segundos': [algoritmo_time.total_seconds()],
-            'Seed': [self.seed]
+            'Seed': [self.seed],
+            'Data': [timestamp]
         }
         else:
             csv_path = 'results/historico_experimentos_ga.csv'
@@ -166,7 +168,8 @@ class experiment:
             'Custo_Medio': [performance_average],
             'Melhor_Custo_Encontrado': [best_result_fitness],
             'Tempo_Exec_Segundos': [algoritmo_time.total_seconds()],
-            'Seed': [self.seed]
+            'Seed': [self.seed],
+            'Data': [timestamp]
         }
             
         df = pd.DataFrame(dados_experimento)

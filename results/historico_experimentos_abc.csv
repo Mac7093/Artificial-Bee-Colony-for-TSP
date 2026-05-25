@@ -1,9 +1,0 @@
-Caso_Teste,Algoritmo,Num_Execucoes,Iteracoes_Max,Num_Bees,Limit,Custo_Medio,Melhor_Custo_Encontrado,Tempo_Exec_Segundos,Seed
-instancia.txt,Artificial Bee Colony,10,100,53,20,29.476223269180526,29.248731902877086,1.258531,42
-teste15.txt,Artificial Bee Colony,10,100,53,20,321.4,303.0,1.197645,42
-teste15.txt,Artificial Bee Colony,10,500,53,20,295.4,291.0,6.35708,42
-teste17.txt,Artificial Bee Colony,10,100,53,20,2186.7,2098.0,1.318494,42
-teste17.txt,Artificial Bee Colony,10,500,53,200,2085.8,2085.0,6.509577,42
-teste26.txt,Artificial Bee Colony,10,500,53,200,966.9,953.0,8.581443,42
-teste42.txt,Artificial Bee Colony,10,500,53,200,858.2,821.0,12.63783,42
-teste48.txt,Artificial Bee Colony,10,500,53,200,42879.4,40295.0,13.642041,42
