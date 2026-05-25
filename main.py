@@ -1,7 +1,6 @@
 import terminal
 import experiment_interface
 import tkinter as tk
-import ex
 
 #USAR PELO TERMINAL
 #t = terminal.terminal()
